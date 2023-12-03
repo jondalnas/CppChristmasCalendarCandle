@@ -32,3 +32,4 @@
 *.app
 
 compile_commands.json
+.cache/
