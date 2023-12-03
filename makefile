@@ -4,11 +4,12 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS = ${patsubst src/%, obj/%, $(SOURCES:.cpp=.o)}
 DEPEND  = ${patsubst src/%, obj/%, $(SOURCES:.cpp=.d)}
 
-CPPFLAGS = -Wall -fsanitize=address
+CPPFLAGS = -Wall -fsanitize=address -g
+LINKINGS = `pkg-config --cflags --libs sdl2`
 
 a.out: $(OBJECTS) $(DEPEND)
-	echo "$(SOURCES)"
-	$(CXX) -I $(INCDIR) $(CPPFLAGS) $(OBJECTS) -o $@ $(LIBS)
+	echo "$(LINKINGS)"
+	$(CXX) -I $(INCDIR) $(CPPFLAGS) $(OBJECTS) -o $@ $(LIBS) $(LINKINGS)
 
 obj/%.o:$(SRCDIR)/%.cpp
 	$(CXX) -c $^ -I $(INCDIR) $(CPPFLAGS) -o $@

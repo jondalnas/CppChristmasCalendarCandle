@@ -1,18 +1,25 @@
 #include "grid.h"
 
 #include <cstdint>
-#include <cstdlib>
 
 #include "grid_node.h"
 #include "vec.h"
 
 using namespace Simulation;
 Grid::Grid(std::uint16_t width, std::uint16_t height) : _width(width), _height(height) {
-	_grid = new GridNode*[width * height];
+	_grid = new GridNode*[width * width * height];
 	for (auto z = 0; z < width; z++) {
 		for (auto y = 0; y < height; y++) {
 			for (auto x = 0; x < width; x++) {
 				_grid[x + z * width + y * width * width] = new GridNode(this, x, y, z);
+			}
+		}
+	}
+
+	for (auto z = 0; z < width; z++) {
+		for (auto y = 0; y < height; y++) {
+			for (auto x = 0; x < width; x++) {
+				_grid[x + z * width + y * width * width]->set_udlrfb(get_grid_node(x,y+1,z), get_grid_node(x,y-1,z), get_grid_node(x-1,y,z), get_grid_node(x+1,y,z), get_grid_node(x,y,z+1), get_grid_node(x,y,z-1));
 			}
 		}
 	}
