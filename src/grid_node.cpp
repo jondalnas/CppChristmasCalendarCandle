@@ -1,10 +1,12 @@
 #include "grid_node.h"
 
 #include "grid.h"
-#include <cstdint>
 
-#define DIFFUSIVITY 0.15e-6
-#define PIXEL_LENGTH 1/(1500.0 / SCREEN_SCALE); //m/px
+#include <cstdint>
+#include <iostream>
+
+#define DIFFUSIVITY 1.34/(900*2.14)
+#define PIXEL_LENGTH (1.0/(1500.0 / SCREEN_SCALE)) //m/px
 #define PIXEL_VOLUME PIXEL_LENGTH * PIXEL_LENGTH * PIXEL_LENGTH //m^3/px^3
 #define SPECIFIC_HEAT_CAPACITY 2.5 //kJ/(kg*K)
 #define MELTING_POINT 55 //C
@@ -93,21 +95,21 @@ void GridNode::update() {
 }
 
 double GridNode::_calc_heat_change() const {
-	double l_diff = 0.0;
-	double r_diff = 0.0;
-	double u_diff = 0.0;
-	double d_diff = 0.0;
-	double f_diff = 0.0;
-	double b_diff = 0.0;
+	double l_temp = l ? l->temp : ROOM_TEMP;
+	double r_temp = r ? r->temp : ROOM_TEMP;
+	double u_temp = u ? u->temp : ROOM_TEMP;
+	double d_temp = d ? d->temp : ROOM_TEMP;
+	double f_temp = f ? f->temp : ROOM_TEMP;
+	double b_temp = b ? b->temp : ROOM_TEMP;
 
-	l_diff = (l->temp - temp) / PIXEL_LENGTH;
-	r_diff = (r->temp - temp) / PIXEL_LENGTH;
+	// Via https://en.wikipedia.org/wiki/Discrete_Laplace_operator
+	// Could also use 27-point stencil, but 7-point might be good enough
+	
+	double laplace = l_temp + r_temp + u_temp + d_temp + f_temp + b_temp - 6 * temp;
+	laplace *= 1.0 / PIXEL_LENGTH;
 
-	u_diff = (u->temp - temp) / PIXEL_LENGTH;
-	d_diff = (d->temp - temp) / PIXEL_LENGTH;
+	if ((int) pos.x == _grid->width / 2 && (int) pos.y == _grid->height / 2 && (int) pos.z == _grid->width / 2)
+		std::cout << temp << " " << DIFFUSIVITY * laplace * get_delta_time() << std::endl;
 
-	f_diff = (f->temp - temp) / PIXEL_LENGTH;
-	b_diff = (b->temp - temp) / PIXEL_LENGTH;
-
-	return DIFFUSIVITY * (l_diff * l_diff + r_diff * r_diff + u_diff * u_diff + d_diff * d_diff + f_diff * f_diff + b_diff * b_diff) * get_delta_time();
+	return DIFFUSIVITY * laplace * get_delta_time();
 }

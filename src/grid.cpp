@@ -6,7 +6,7 @@
 #include "vec.h"
 
 using namespace Simulation;
-Grid::Grid(std::uint16_t width, std::uint16_t height) : _width(width), _height(height) {
+Grid::Grid(std::uint16_t width, std::uint16_t height) : width(width), height(height) {
 	_grid = new GridNode*[width * width * height];
 	for (auto z = 0; z < width; z++) {
 		for (auto y = 0; y < height; y++) {
@@ -19,7 +19,13 @@ Grid::Grid(std::uint16_t width, std::uint16_t height) : _width(width), _height(h
 	for (auto z = 0; z < width; z++) {
 		for (auto y = 0; y < height; y++) {
 			for (auto x = 0; x < width; x++) {
-				_grid[x + z * width + y * width * width]->set_udlrfb(get_grid_node(x,y+1,z), get_grid_node(x,y-1,z), get_grid_node(x-1,y,z), get_grid_node(x+1,y,z), get_grid_node(x,y,z+1), get_grid_node(x,y,z-1));
+				const auto u = y == height-1 ? nullptr : get_grid_node(x,y+1,z);
+				const auto d = y == 0 ? nullptr : get_grid_node(x,y-1,z);
+				const auto l = x == 0 ? nullptr : get_grid_node(x-1,y,z);
+				const auto r = x == width-1 ? nullptr : get_grid_node(x+1,y,z);
+				const auto f = z == width-1 ? nullptr : get_grid_node(x,y,z+1);
+				const auto b = z == 0 ? nullptr : get_grid_node(x,y,z-1);
+				_grid[x + z * width + y * width * width]->set_udlrfb(u, d, l, r, f, b);
 			}
 		}
 	}
@@ -36,9 +42,9 @@ Vec2 Grid::calc_grad(const std::uint16_t x, const std::uint16_t y, const std::ui
 		auto y_max = y + d;
 
 		if (xn == 0 && x_min < 0) xn = -d;
-		if (xp == 0 && x_max >= _width) xp = d;
+		if (xp == 0 && x_max >= width) xp = d;
 		if (yn == 0 && y_min < 0) yn = -d;
-		if (yp == 0 && y_max >= _width) yp = d;
+		if (yp == 0 && y_max >= width) yp = d;
 
 		if (xn == 0 && !is_free(x_min, y, z)) {
 			xn = -d;
