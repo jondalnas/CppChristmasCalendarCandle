@@ -3,7 +3,7 @@
 #include "grid.h"
 
 #include <cstdint>
-#include <iostream>
+#include <cmath>
 
 #define DIFFUSIVITY 1.34/(900*2.14)
 #define PIXEL_LENGTH (1.0/(1500.0 / SCREEN_SCALE)) //m/px
@@ -18,6 +18,7 @@
 #define SPECIFIC_HEAT_CAPACITY_MASS SPECIFIC_HEAT_CAPACITY * PIXEL_MASS //kJ/K
 #define LIQUID_VELOCITY 1.0 * SCREEN_SCALE / 1.0 //px/s
 #define LIQUID_DOWN_VELOCITY 2.0 * SCREEN_SCALE / 1.0 //px/s
+#define EXTINCTION_COEFFICIENT 1.5e-5
 
 extern const int SCREEN_SCALE;
 extern double get_delta_time();
@@ -108,8 +109,12 @@ double GridNode::_calc_heat_change() const {
 	double laplace = l_temp + r_temp + u_temp + d_temp + f_temp + b_temp - 6 * temp;
 	laplace *= 1.0 / PIXEL_LENGTH;
 
-	if ((int) pos.x == _grid->width / 2 && (int) pos.y == _grid->height / 2 && (int) pos.z == _grid->width / 2)
-		std::cout << temp << " " << DIFFUSIVITY * laplace * get_delta_time() << std::endl;
-
 	return DIFFUSIVITY * laplace * get_delta_time();
+}
+
+double GridNode::add_energy(double energy, double length) {
+	auto T_r = std::exp(-EXTINCTION_COEFFICIENT * length * PIXEL_LENGTH);
+	temp += energy / SPECIFIC_HEAT_CAPACITY_MASS * (1.0 - T_r);
+
+	return energy * T_r;
 }

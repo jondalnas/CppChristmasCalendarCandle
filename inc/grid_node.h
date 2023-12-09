@@ -68,6 +68,8 @@ namespace Simulation {
 				source->b = b;
 			}
 
+			double add_energy(double energy, double length);
+
 			inline bool empty() const {
 				return _state == GAS;
 			}

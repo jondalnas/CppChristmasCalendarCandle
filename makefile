@@ -4,7 +4,7 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS = ${patsubst src/%, obj/%, $(SOURCES:.cpp=.o)}
 DEPEND  = ${patsubst src/%, obj/%, $(SOURCES:.cpp=.d)}
 
-CPPFLAGS = -Wall -fsanitize=address -g -O0
+CPPFLAGS = -Wall -fsanitize=address -g -O0 -std=c++20
 LINKINGS = `pkg-config --cflags --libs sdl2`
 
 a.out: $(OBJECTS) $(DEPEND)
