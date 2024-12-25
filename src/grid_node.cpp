@@ -2,6 +2,8 @@
 
 #include "grid.h"
 
+#include <iostream>
+
 #include <cstdint>
 #include <cmath>
 
@@ -107,7 +109,7 @@ double GridNode::_calc_heat_change() const {
 	// Could also use 27-point stencil, but 7-point might be good enough
 	
 	double laplace = l_temp + r_temp + u_temp + d_temp + f_temp + b_temp - 6 * temp;
-	laplace *= 1.0 / PIXEL_LENGTH;
+	laplace *= 1.0 / (PIXEL_VOLUME);
 
 	return DIFFUSIVITY * laplace * get_delta_time();
 }

@@ -23,6 +23,8 @@ namespace Simulation {
 			}
 
 			inline void update() {
+				_update_flame(Vec3(width/2.0, height/4.0*3, width/2.0));
+
 				for (auto z = 0; z < width; z++) {
 					for (auto y = 0; y < height; y++) {
 						for (auto x = 0; x < width; x++) {

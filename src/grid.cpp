@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <numbers>
 
+#include <iostream>
+
 #include "grid_node.h"
 #include "vec.h"
 
@@ -81,13 +83,13 @@ void Grid::_trace_flame_ray(const Vec3 pos, const Vec3 dir) {
 }
 
 void Grid::_update_flame(const Vec3 pos) {
-	static constexpr JitterGrid grid = JitterGrid<JITTERS>();
-
+	std::cout << JITTERS << std::endl;
 	for (auto y = 0; y < JITTERS; y++) {
 		for (auto x = 0; x < JITTERS; x++) {
-			Vec2 jit = grid.array[x + y * JITTERS];
-			jit += { (double) std::rand() / RAND_MAX / JITTERS, (double) std::rand() / RAND_MAX / JITTERS };
+			Vec2 jit = {(x + (double) std::rand() / RAND_MAX ) / JITTERS, (y + (double) std::rand() / RAND_MAX) / JITTERS};
 			Vec3 dir = _calc_direction(jit.x, jit.y);
+
+			std::cout << dir.x << " " << dir.y << " " << dir.z << std::endl;
 
 			_trace_flame_ray(pos, dir);
 		}
